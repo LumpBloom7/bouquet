@@ -9,9 +9,6 @@ RUN dnf -qy install \
     glibc-all-langpacks \
     --exclude dracut-config-rescue
 
-# add default groups
-RUN groupadd plugdev
-
 # Drivers and System configuration
 
     # Networking and bluetooth
@@ -38,10 +35,14 @@ RUN groupadd plugdev
     RUN dnf install -qy dkms
     COPY --chmod=755 build-akmods.sh /tmp
     RUN /tmp/build-akmods.sh
+    RUN rm -fr /tmp/bin /tmp/build-akmods.sh /tmp/fake-uname /tmp/akmods
 
     # Remove akmod build tools
     ## [NOTE] The expectation is that the kmod is already built, so we really don't need this anymore
     RUN dnf remove -qy akmod-nvidia dkms
+    RUN dnf -qy autoremove
+    RUN userdel akmods
+
 
     # Inject kargs to prevent nouveau/nova modules from being loaded
     COPY --chmod=755 usr/lib/bootc/kargs.d/nvidia.toml /usr/lib/bootc/kargs.d/nvidia.toml
@@ -76,11 +77,12 @@ RUN dnf install -qy starship
 RUN dnf install -qy lazygit git-delta
 
 # Greeter
-COPY usr/etc/greetd /usr/etc/greetd/
+
 RUN dnf install -qy noctalia-greeter
 RUN mkdir /var/lib/noctalia-greeter
 RUN chown greetd /var/lib/noctalia-greeter
 
+COPY --chown=greetd etc/greetd /etc/greetd/
 RUN systemctl enable greetd
 
 RUN authselect enable-feature with-systemd-homed
@@ -88,4 +90,8 @@ RUN systemctl enable systemd-homed
 
 RUN dnf clean all
 
+RUN rm -rf /var/log/* &&\
+    rm -rf /var/cache/*
+
+RUN bootc container lint --no-truncate
 
