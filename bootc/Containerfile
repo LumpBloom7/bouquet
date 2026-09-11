@@ -1,9 +1,9 @@
 FROM quay.io/fedora/fedora-bootc:latest
 
-RUN dnf upgrade -y
+RUN dnf upgrade -qy
 
 # Standard metapackages for setting up a standard GUI install
-RUN dnf -y install \
+RUN dnf -qy install \
     @core \
     @hardware-support \
     @standard \
@@ -15,42 +15,56 @@ RUN dnf -y install \
 RUN groupadd plugdev
 
 # Drivers and System configuration
-RUN dnf install -y wine-ntsync
-RUN dnf install -y steam-devices
-RUN dnf install -y flatpak
 
-## Install nvidia drivers
-RUN dnf install -y https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-RUN dnf install -y xorg-x11-drv-nvidia-cuda
+    # Networking and bluetooth
+    RUN dnf install -qy NetworkManager-wifi
+    RUN dnf install -qy bluez
 
-# Nvidia container integration using CDI
-RUN curl -s -L https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo | \
-    tee /etc/yum.repos.d/nvidia-container-toolkit.repo
-RUN dnf install -y nvidia-container-toolkit-base
+    # Quality of life for gaming
+    RUN dnf install -qy wine-ntsync
+    RUN dnf install -qy steam-devices
+
+
+    RUN dnf install -qy flatpak
+
+    # For power management
+    RUN dnf install -qy tuned
+
+    ## Printers
+    RUN dnf install -qy cups cups-filters 
+
+    ## Install nvidia drivers
+    RUN dnf install -qy https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+    RUN dnf install -qy xorg-x11-drv-nvidia-cuda
+
+    # Nvidia container integration using CDI
+    RUN curl -s -L https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo | \
+        tee /etc/yum.repos.d/nvidia-container-toolkit.repo
+    RUN dnf install -qy nvidia-container-toolkit-base
 
 # Setup compositor
-RUN dnf install -y niri --setopt=install_weak_deps=False 
-RUN dnf install -y noctalia
-# [TODO] Display manager needs to be added (maybe noctalia greeter?)
+RUN dnf install -qy niri --setopt=install_weak_deps=False 
+RUN dnf install -qy xdg-desktop-portal-gnome gnome-keyring
+RUN dnf install -qy noctalia
 # [TODO] Try out umbriel compositor?
 
-RUN dnf install -y xorg-x11-drv-nvidia-cuda
-
 # Some AppImages (osu) are still using the FUSE v2 runtime
-RUN dnf install -y fuse fuse-libs
+RUN dnf install -qy fuse fuse-libs
+
+# Fonts and themes
+RUN dnf install -qy default-fonts fontawesome-fonts-all gnome-icon-theme adw-gtk3-theme google-noto-color-emoji-fonts
 
 # Utilities
-RUN dnf install -y git-credential-libsecret git-credential-oauth
-RUN dnf install -y ibus-panel
-RUN dnf install -y podman-compose
-RUN dnf install -y foot
+RUN dnf install -qy git-credential-libsecret git-credential-oauth
+RUN dnf install -qy ibus-panel
+RUN dnf install -qy podman-compose
+RUN dnf install -qy foot fish
 
 # Terra utilities
-RUN dnf install -y --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
-RUN dnf install -y starship
-RUN dnf install -y lazygit git-delta
-RUN dnf install -y noctalia-greeter
-
+RUN dnf install -qy --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
+RUN dnf install -qy starship
+RUN dnf install -qy lazygit git-delta
+RUN dnf install -qy noctalia-greeter
 
 # Copy basic configuration
 COPY etc /usr/etc/
@@ -61,3 +75,5 @@ RUN authselect enable-feature with-systemd-homed
 RUN systemctl enable systemd-homed
 
 RUN dnf clean all
+
+
