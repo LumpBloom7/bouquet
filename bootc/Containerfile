@@ -43,6 +43,9 @@ RUN groupadd plugdev
     ## [NOTE] The expectation is that the kmod is already built, so we really don't need this anymore
     RUN dnf remove -qy akmod-nvidia dkms
 
+    # Inject kargs to prevent nouveau/nova modules from being loaded
+    COPY --chmod=755 usr/lib/bootc/kargs.d/nvidia.toml /usr/lib/bootc/kargs.d/nvidia.toml
+
     # Nvidia container integration using CDI
     RUN curl -s -L https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo | \
         tee /etc/yum.repos.d/nvidia-container-toolkit.repo
@@ -71,11 +74,10 @@ RUN dnf install -qy foot fish
 RUN dnf install -qy --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
 RUN dnf install -qy starship
 RUN dnf install -qy lazygit git-delta
+
+# Greeter
+COPY usr/etc/greetd /usr/etc/greetd/
 RUN dnf install -qy noctalia-greeter
-
-# Copy basic configuration
-COPY etc /usr/etc/
-
 RUN mkdir /var/lib/noctalia-greeter
 RUN chown greetd /var/lib/noctalia-greeter
 
