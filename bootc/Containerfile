@@ -1,7 +1,5 @@
 FROM quay.io/fedora/fedora-bootc:latest
 
-RUN dnf upgrade -qy
-
 # Standard metapackages for setting up a standard GUI install
 RUN dnf -qy install \
     @core \
@@ -24,8 +22,7 @@ RUN groupadd plugdev
     RUN dnf install -qy wine-ntsync
     RUN dnf install -qy steam-devices
 
-
-    RUN dnf install -qy flatpak
+    RUN dnf install -qy flatpak # Duh...
 
     # For power management
     RUN dnf install -qy tuned
@@ -37,14 +34,25 @@ RUN groupadd plugdev
     RUN dnf install -qy https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
     RUN dnf install -qy xorg-x11-drv-nvidia-cuda
 
+    # Force akmods to built
+    RUN dnf install -qy dkms
+    COPY --chmod=755 build-akmods.sh /tmp
+    RUN /tmp/build-akmods.sh
+
+    # Remove akmod build tools
+    ## [NOTE] The expectation is that the kmod is already built, so we really don't need this anymore
+    RUN dnf remove -qy akmod-nvidia dkms
+
     # Nvidia container integration using CDI
     RUN curl -s -L https://nvidia.github.io/libnvidia-container/stable/rpm/nvidia-container-toolkit.repo | \
         tee /etc/yum.repos.d/nvidia-container-toolkit.repo
     RUN dnf install -qy nvidia-container-toolkit-base
 
+    RUN dnf install -qy ibus-panel ibus-pinyin
+
 # Setup compositor
 RUN dnf install -qy niri --setopt=install_weak_deps=False 
-RUN dnf install -qy xdg-desktop-portal-gnome gnome-keyring
+RUN dnf install -qy xdg-desktop-portal-gnome gnome-keyring nautilus "gvfs-*"
 RUN dnf install -qy noctalia
 # [TODO] Try out umbriel compositor?
 
@@ -56,7 +64,7 @@ RUN dnf install -qy default-fonts fontawesome-fonts-all gnome-icon-theme adw-gtk
 
 # Utilities
 RUN dnf install -qy git-credential-libsecret git-credential-oauth
-RUN dnf install -qy ibus-panel
+
 RUN dnf install -qy podman-compose
 RUN dnf install -qy foot fish
 
@@ -68,6 +76,9 @@ RUN dnf install -qy noctalia-greeter
 
 # Copy basic configuration
 COPY etc /usr/etc/
+
+RUN mkdir /var/lib/noctalia-greeter
+RUN chown greetd /var/lib/noctalia-greeter
 
 RUN systemctl enable greetd
 
