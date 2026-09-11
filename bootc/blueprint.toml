@@ -1,0 +1,8 @@
+[[customizations.user]]
+name = "root"
+password = "$6$slY/GaIv/9KWMxn1$xVLyoRXSUjYPeyIFnppJRO7LS.n.fqX6WiNx200BTc35cevLOTPeiSv7aGOsiIbP74n3PX15drO2gFO8iIDo9/"
+groups = ["wheel", "plugdev"]
+
+[[customizations.group]]
+name = "plugdev"
+gid = 1001
