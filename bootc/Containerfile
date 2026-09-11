@@ -25,7 +25,7 @@ RUN groupadd plugdev
     RUN dnf install -qy flatpak # Duh...
 
     # For power management
-    RUN dnf install -qy tuned
+    RUN dnf install -qy tuned-ppd
 
     ## Printers
     RUN dnf install -qy cups cups-filters 
@@ -48,7 +48,7 @@ RUN groupadd plugdev
         tee /etc/yum.repos.d/nvidia-container-toolkit.repo
     RUN dnf install -qy nvidia-container-toolkit-base
 
-    RUN dnf install -qy ibus-panel ibus-pinyin
+    RUN dnf install -qy ibus-panel ibus-libpinyin
 
 # Setup compositor
 RUN dnf install -qy niri --setopt=install_weak_deps=False 
@@ -63,8 +63,7 @@ RUN dnf install -qy fuse fuse-libs
 RUN dnf install -qy default-fonts fontawesome-fonts-all gnome-icon-theme adw-gtk3-theme google-noto-color-emoji-fonts
 
 # Utilities
-RUN dnf install -qy git-credential-libsecret git-credential-oauth
-
+RUN dnf install -qy git-credential-libsecret git-credential-oauth pinentry-gnome3 gnupg2-scdaemon
 RUN dnf install -qy podman-compose
 RUN dnf install -qy foot fish
 
