@@ -29,7 +29,7 @@ RUN dnf -qy install \
     RUN dnf install -qy tuned-ppd
 
     ## Printers
-    RUN dnf install -qy cups cups-filters 
+    RUN dnf install -qy @printing
 
     ## Install nvidia drivers
     RUN dnf install -qy https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
