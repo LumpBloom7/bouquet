@@ -16,6 +16,9 @@ RUN dnf -qy install \
     RUN dnf install -qy NetworkManager-wifi
     RUN dnf install -qy bluez
 
+    # Audio support 
+    RUN dnf install -qy pipewire
+
     # Quality of life for gaming
     RUN dnf install -qy wine-ntsync
     RUN dnf install -qy steam-devices
