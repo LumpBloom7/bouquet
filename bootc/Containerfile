@@ -98,8 +98,27 @@ RUN /tmp/initramfs.sh
 
 RUN dnf clean all
 
+# Things we can't delete here are mounts from podman
+RUN find /var/* -maxdepth 0 -type d \! -name cache -exec rm -fr {} \;
+
+RUN find /run -mindepth 1 \
+  ! -path '/run/systemd' \
+  ! -path '/run/systemd/resolve' \
+  ! -path '/run/systemd/resolve/stub-resolv.conf' \
+  ! -path '/run/secrets' \
+  ! -path '/run/secrets/*' \
+  ! -path '/run/.containerenv' \
+  -delete
+
+RUN rm -rf /tmp/*
+RUN mkdir -p /var/tmp
+
 RUN rm -rf /var/log/* &&\
     rm -rf /var/cache/*
 
-RUN bootc container lint --no-truncate
+# Needs to be here to make the main image build strict (no /opt there)
+# This is for downstream images/stuff like k0s
+RUN rm -rf /opt && ln -s /var/opt /opt
+
+RUN bootc container lint --fatal-warnings --no-truncate
 
