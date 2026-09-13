@@ -93,6 +93,9 @@ RUN systemctl enable greetd
 RUN authselect enable-feature with-systemd-homed
 RUN systemctl enable systemd-homed
 
+COPY --chmod=755 initramfs.sh /tmp
+RUN /tmp/initramfs.sh
+
 RUN dnf clean all
 
 RUN rm -rf /var/log/* &&\
