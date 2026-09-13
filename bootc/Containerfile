@@ -47,7 +47,6 @@ RUN dnf -qy install \
     RUN dnf -qy autoremove
     RUN userdel akmods
 
-
     # Inject kargs to prevent nouveau/nova modules from being loaded
     COPY --chmod=755 usr/lib/bootc/kargs.d/nvidia.toml /usr/lib/bootc/kargs.d/nvidia.toml
 
@@ -68,7 +67,7 @@ RUN dnf install -qy noctalia
 RUN dnf install -qy fuse fuse-libs
 
 # Fonts and themes
-RUN dnf install -qy default-fonts fontawesome-fonts-all gnome-icon-theme adw-gtk3-theme google-noto-color-emoji-fonts
+RUN dnf install -qy default-fonts gnome-icon-theme
 
 # Utilities
 RUN dnf install -qy git-credential-libsecret git-credential-oauth pinentry-gnome3 gnupg2-scdaemon
