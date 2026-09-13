@@ -60,6 +60,7 @@ RUN dnf -qy install \
 # Setup compositor
 RUN dnf install -qy niri --setopt=install_weak_deps=False 
 RUN dnf install -qy xdg-desktop-portal-gtk xdg-desktop-portal-gnome gnome-keyring nautilus "gvfs-*"
+  # [TODO] Replace gkr with oo7, since that will be the primary keyring in the future, and plays nicer with greetd PAM
 RUN dnf install -qy noctalia
 # [TODO] Try out umbriel compositor?
 
