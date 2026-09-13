@@ -85,10 +85,12 @@ RUN dnf install -qy lazygit git-delta
 
 RUN dnf install -qy noctalia-greeter
 RUN mkdir /var/lib/noctalia-greeter
-RUN chown greetd /var/lib/noctalia-greeter
 
-COPY --chown=greetd etc/greetd /etc/greetd/
+COPY etc/greetd /etc/greetd/
 RUN systemctl enable greetd
+
+COPY usr/lib/systemd/system/noctalia-greeter-sync-perms.service /usr/lib/systemd/system/noctalia-greeter-folder-perms.service
+RUN systemctl enable noctalia-greeter-folder-perms
 
 RUN authselect enable-feature with-systemd-homed
 RUN systemctl enable systemd-homed

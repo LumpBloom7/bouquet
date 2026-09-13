@@ -1,0 +1,11 @@
+[Unit]
+Description=Assign proper ownership to noctalia-greeter sync directory
+Before=greetd.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'chown greetd -hR /var/lib/noctalia-greeter'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
