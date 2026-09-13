@@ -71,6 +71,7 @@ RUN dnf install -qy fuse fuse-libs
 RUN dnf install -qy default-fonts gnome-icon-theme
 
 # Utilities
+RUN dnf install -qy gnome-disk-utility
 RUN dnf install -qy git-credential-libsecret git-credential-oauth pinentry-gnome3 gnupg2-scdaemon
 RUN dnf install -qy podman-compose
 RUN dnf install -qy foot fish
