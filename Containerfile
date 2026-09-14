@@ -98,6 +98,9 @@ RUN systemctl enable systemd-homed
 COPY --chmod=755 initramfs.sh /tmp
 RUN /tmp/initramfs.sh
 
+COPY --chmod=755 adjust-os-release.sh /tmp
+RUN /tmp/adjust-os-release.sh
+
 RUN dnf clean all
 
 RUN find /run -mindepth 1 \
@@ -118,5 +121,6 @@ RUN rm -rf /var/log/* &&\
 # Needs to be here to make the main image build strict (no /opt there)
 # This is for downstream images/stuff like k0s
 RUN rm -rf /opt && ln -s /var/opt /opt
+
 
 RUN bootc container lint --no-truncate
