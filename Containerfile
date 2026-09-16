@@ -23,7 +23,7 @@ RUN dnf -qy install \
     RUN dnf install -qy wine-ntsync
     RUN dnf install -qy steam-devices
 
-    RUN dnf install -qy flatpak # Duh...
+    RUN dnf install -qy flatpak
 
     # For power management
     RUN dnf install -qy tuned-ppd
@@ -58,7 +58,7 @@ RUN dnf -qy install \
     RUN dnf install -qy ibus-panel ibus-libpinyin
 
 # Setup compositor
-RUN dnf install -qy niri --setopt=install_weak_deps=False 
+RUN dnf install -qy niri --setopt=install_weak_deps=False
 RUN dnf install -qy xdg-desktop-portal-gtk xdg-desktop-portal-gnome gnome-keyring nautilus "gvfs-*"
   # [TODO] Replace gkr with oo7, since that will be the primary keyring in the future, and plays nicer with greetd PAM
 RUN dnf install -qy noctalia
@@ -71,32 +71,43 @@ RUN dnf install -qy fuse fuse-libs
 RUN dnf install -qy default-fonts gnome-icon-theme
 
 # Utilities
-RUN dnf install -qy gnome-disk-utility
-RUN dnf install -qy git-credential-libsecret git-credential-oauth pinentry-gnome3 gnupg2-scdaemon
-RUN dnf install -qy podman-compose
-RUN dnf install -qy foot fish
+    RUN dnf install -qy gnome-disk-utility
+    RUN dnf install -qy git-credential-libsecret git-credential-oauth pinentry-gnome3 gnupg2-scdaemon
+    RUN dnf install -qy podman-compose
+    RUN dnf install -qy foot fish
 
 # Terra utilities
-RUN dnf install -qy --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
-RUN dnf install -qy starship
-RUN dnf install -qy lazygit git-delta
+    RUN dnf install -qy --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
+    RUN dnf install -qy starship
+    RUN dnf install -qy lazygit git-delta
 
 # Greeter
 
-RUN dnf install -qy noctalia-greeter
-RUN mkdir /var/lib/noctalia-greeter
+    RUN dnf install -qy noctalia-greeter
+    RUN mkdir /var/lib/noctalia-greeter
 
-COPY etc/greetd /etc/greetd/
-RUN systemctl enable greetd
+    COPY etc/greetd /etc/greetd/
+    RUN systemctl enable greetd
 
-COPY usr/lib/systemd/system/noctalia-greeter-sync-perms.service /usr/lib/systemd/system/noctalia-greeter-folder-perms.service
-RUN systemctl enable noctalia-greeter-folder-perms
+    COPY usr/lib/systemd/system/noctalia-greeter-sync-perms.service /usr/lib/systemd/system/noctalia-greeter-folder-perms.service
+    RUN systemctl enable noctalia-greeter-folder-perms
 
-RUN authselect enable-feature with-systemd-homed
-RUN systemctl enable systemd-homed
+    RUN authselect enable-feature with-systemd-homed
+    RUN systemctl enable systemd-homed
 
-COPY --chmod=755 initramfs.sh /tmp
-RUN /tmp/initramfs.sh
+# This service forcefully restarts the computer, which is disruptive
+RUN systemctl mask bootc-fetch-apply-updates.timer
+
+# This autoupdate service only stages deployments without rebooting the system
+RUN systemctl enable rpm-ostreed-automatic.timer
+
+# Forcefully build a new initramfs that contains the essential kernel modules
+# This allows things like the firmware and drivers to be loaded earlier, preventing the kernel fallbacks from loading at all
+## Example: simple-fb is loaded, occupying eDP-1 on my system, before amdgpu takes eDP-2. 
+##          Loading amdgpu more eagerly prevents simple-fb from spawning, and the display is properly connected to eDP-1
+    COPY --chmod=755 initramfs.sh /tmp
+    RUN /tmp/initramfs.sh
+
 
 COPY --chmod=755 adjust-os-release.sh /tmp
 RUN /tmp/adjust-os-release.sh
@@ -121,6 +132,8 @@ RUN rm -rf /var/log/* &&\
 # Needs to be here to make the main image build strict (no /opt there)
 # This is for downstream images/stuff like k0s
 RUN rm -rf /opt && ln -s /var/opt /opt
+
+RUN du -h /var/ | sort -h
 
 
 RUN bootc container lint --no-truncate
