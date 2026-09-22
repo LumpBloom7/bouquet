@@ -3,7 +3,6 @@ FROM quay.io/fedora/fedora-bootc:latest
 # Standard metapackages for setting up a standard GUI install
 RUN dnf -qy install \
     @core \
-    @hardware-support \
     @standard \
     @base-graphical \
     glibc-all-langpacks \
@@ -35,9 +34,9 @@ RUN dnf -qy install \
     RUN dnf install -qy https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
     RUN dnf install -qy xorg-x11-drv-nvidia-cuda
 
-    # Force akmods to built
+    # Force akmods to build
     RUN dnf install -qy dkms
-    COPY --chmod=755 build-akmods.sh /tmp
+    COPY --chmod=755 tmp/build-akmods.sh /tmp
     RUN /tmp/build-akmods.sh
     RUN rm -fr /tmp/bin /tmp/build-akmods.sh /tmp/fake-uname /tmp/akmods
 
@@ -105,11 +104,11 @@ RUN systemctl enable rpm-ostreed-automatic.timer
 # This allows things like the firmware and drivers to be loaded earlier, preventing the kernel fallbacks from loading at all
 ## Example: simple-fb is loaded, occupying eDP-1 on my system, before amdgpu takes eDP-2. 
 ##          Loading amdgpu more eagerly prevents simple-fb from spawning, and the display is properly connected to eDP-1
-    COPY --chmod=755 initramfs.sh /tmp
-    RUN /tmp/initramfs.sh
+    COPY --chmod=755 tmp/build-initramfs.sh /tmp
+    RUN /tmp/build-initramfs.sh
 
 
-COPY --chmod=755 adjust-os-release.sh /tmp
+COPY --chmod=755 tmp/adjust-os-release.sh /tmp
 RUN /tmp/adjust-os-release.sh
 
 RUN dnf clean all
