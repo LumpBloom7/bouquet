@@ -62,17 +62,25 @@ jobs:
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
-      - name: Build and push Docker image
+      - name: Build bootc image
         id: build-and-push
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
           context: "./"
           file: "./Containerfile"
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ghcr.io/lumpbloom7/bouquet-bootc:latest
+          push: false
+          tags: localhost/bouquet-bootc:latest
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Rechunk bootc image
+        if: ${{ github.event_name != 'pull_request' }}
+        run:  docker run --rm --privileged -v /var/lib/containers:/var/lib/containers:rw quay.io/fedora/fedora-bootc:latest /usr/libexec/bootc-base-imagectl rechunk localhost/bouquet-bootc:latest ghcr.io/lumpbloom7/bouquet-bootc:latest
+
+      - name: Push rechunked bootc image to registry
+        if: ${{ github.event_name != 'pull_request' }}
+        run: docker push ghcr.io/lumpbloom7/bouquet-bootc:latest
 
       # Sign the resulting Docker image digest except on PRs.
       # This will only write to the public Rekor transparency log when the Docker
