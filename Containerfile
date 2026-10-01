@@ -23,7 +23,7 @@ dnf -qy install \
 dnf install -qy NetworkManager-wifi bluez
 dnf install -qy pipewire
 dnf install -qy wine-ntsync steam-devices
-dnf install -qy flatpak
+dnf install -qy flatpak toolbox
 dnf install -qy tuned-ppd
 dnf install -qy @printing
 

@@ -64,7 +64,11 @@ jobs:
 
       - name: Rechunk bootc image
         if: ${{ github.event_name != 'pull_request' }}
-        run: sudo podman run --rm --privileged -v /var/lib/containers:/var/lib/containers:rw quay.io/fedora/fedora-bootc:latest /usr/libexec/bootc-base-imagectl rechunk localhost/bouquet-bootc:latest ghcr.io/lumpbloom7/bouquet-bootc:latest
+        run: |
+          export CHUNKAH_CONFIG_STR="$(podman inspect localhost/bouquet-bootc:latest)"
+          podman run --rm --mount=type=image,src=$IMG,dest=/chunkah \
+            -e CHUNKAH_CONFIG_STR quay.io/coreos/chunkah build \
+            -t ghcr.io/lumpbloom7/bouquet-bootc:latest | podman load
 
       - name: Push rechunked bootc image to registry
         if: ${{ github.event_name != 'pull_request' }}
