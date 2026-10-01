@@ -8,6 +8,7 @@ COPY usr /usr
 COPY etc /etc
 
 RUN <<EORUN
+
 set -xeuo pipefail
 
 dnf -qy install \
@@ -86,7 +87,7 @@ mkdir -p /var/tmp
 
 rm -rf /opt && ln -s /var/opt /opt
 
-RUN find /run -mindepth 1 \
+find /run -mindepth 1 \
   ! -path '/run/systemd' \
   ! -path '/run/systemd/resolve' \
   ! -path '/run/systemd/resolve/stub-resolv.conf' \
