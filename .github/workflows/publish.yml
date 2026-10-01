@@ -42,15 +42,30 @@ jobs:
         if: github.event_name != 'pull_request'
         run: echo ${{ secrets.GITHUB_TOKEN }} | podman login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
 
+      - id: unload-apparmor-profiles
+        name: Unload all AppArmor profiles
+        # The || true is currently necessary because of a bug in
+        # aa-teardown.  See
+        # https://bugs.launchpad.net/ubuntu/+source/apparmor/+bug/2093797
+        # for more details.
+        run: sudo aa-teardown || true
+        shell: bash -Eueo pipefail -x {0}
+
+      - id: disable-apparmor
+        name: Disable and stop AppArmor systemd service
+        run: sudo systemctl disable --now apparmor.service
+        shell: bash -Eueo pipefail -x {0}
+
+
       - name: Build bootc image
         id: build-bootc
         shell: bash
-        run: podman build --cap-add=all --security-opt=label=type:container_runtime_t --device /dev/fuse -f Containerfile -t localhost/bouquet-bootc:latest
+        run: sudo podman build --cap-add=all --security-opt=label=type:container_runtime_t --device /dev/fuse -f Containerfile -t localhost/bouquet-bootc:latest
 
       - name: Rechunk bootc image
         if: ${{ github.event_name != 'pull_request' }}
-        run:  podman run --rm --privileged -v /var/lib/containers:/var/lib/containers:rw quay.io/fedora/fedora-bootc:latest /usr/libexec/bootc-base-imagectl rechunk localhost/bouquet-bootc:latest ghcr.io/lumpbloom7/bouquet-bootc:latest
+        run: sudo podman run --rm --privileged -v /var/lib/containers:/var/lib/containers:rw quay.io/fedora/fedora-bootc:latest /usr/libexec/bootc-base-imagectl rechunk localhost/bouquet-bootc:latest ghcr.io/lumpbloom7/bouquet-bootc:latest
 
       - name: Push rechunked bootc image to registry
         if: ${{ github.event_name != 'pull_request' }}
-        run: podman push ghcr.io/lumpbloom7/bouquet-bootc:latest
+        run: sudo podman push ghcr.io/lumpbloom7/bouquet-bootc:latest
