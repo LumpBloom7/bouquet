@@ -46,6 +46,7 @@ dnf install -qy nvidia-container-toolkit-base
 dnf install -qy ibus-panel ibus-libpinyin 
 
 dnf install -qy niri --setopt=install_weak_deps=False
+dnf install -qy xrdb --setopt=install_weak_deps=False
 dnf install -qy xdg-desktop-portal-gtk xdg-desktop-portal-gnome gnome-keyring nautilus "gvfs-*"
 dnf install -qy noctalia 
 
