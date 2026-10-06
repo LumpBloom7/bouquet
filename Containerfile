@@ -60,7 +60,6 @@ dnf install -qy podman-compose
 dnf install -qy foot fish 
 
 dnf install -qy --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
-dnf install -qy starship
 dnf install -qy lazygit git-delta
 
 dnf install -qy noctalia-greeter
