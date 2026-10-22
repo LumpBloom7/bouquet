@@ -6,7 +6,7 @@ StartLimitBurst=10
 
 [Service]
 Type=simple
-ExecStart=flatpak run --command=bazaar-daemon --no-window io.github.kolunmi.Bazaar
+ExecStart=flatpak run --command=bazaar-daemon io.github.kolunmi.Bazaar --no-window
 StandardOutput=journal
 Restart=on-failure
 RestartSec=5
