@@ -15,6 +15,7 @@ dnf -qy install \
     @core \
     @standard \
     @base-graphical \
+    fedora-release-ostree-desktop \
     linux-firmware \
     glibc-all-langpacks \
     --exclude dracut-config-rescue \
