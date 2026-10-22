@@ -73,6 +73,7 @@ authselect enable-feature with-systemd-homed
 systemctl enable systemd-homed
 
 systemctl --global enable bazaar.service
+systemctl enable bootc-fetch-apply-updates.timer
 
 chmod +x /tmp/build-initramfs.sh
 chmod +x /tmp/adjust-os-release.sh
