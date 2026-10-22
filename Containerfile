@@ -72,8 +72,7 @@ systemctl enable noctalia-greeter-sync-perms
 authselect enable-feature with-systemd-homed
 systemctl enable systemd-homed
 
-systemctl mask bootc-fetch-apply-updates.timer
-systemctl enable rpm-ostreed-automatic.timer
+systemctl --global enable bazaar.service
 
 chmod +x /tmp/build-initramfs.sh
 chmod +x /tmp/adjust-os-release.sh
