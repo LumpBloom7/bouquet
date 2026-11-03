@@ -55,11 +55,10 @@ dnf install -qy fuse fuse-libs
 
 dnf install -qy default-fonts gnome-icon-theme 
 
-dnf install -qy oo7-daemon pam_oo7
-systemctl --global enable oo7-daemon.service
+dnf install -qy oo7-daemon pam_oo7 pinentry-gnome3 gnupg2-scdaemon gcr3
+dnf install -qy git-core git-credential-oo7 git-credential-oauth 
 
 dnf install -qy gnome-disk-utility 
-dnf install -qy git-credential-oo7 git-credential-oauth pinentry-gnome3 gnupg2-scdaemon
 dnf install -qy podman-compose 
 dnf install -qy foot fish 
 
