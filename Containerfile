@@ -1,4 +1,4 @@
-FROM quay.io/fedora/fedora-bootc:latest as builder
+FROM quay.io/fedora/fedora-bootc:44 as builder
 RUN /usr/libexec/bootc-base-imagectl build-rootfs --manifest=minimal /target-rootfs
 
 FROM scratch
@@ -48,12 +48,14 @@ dnf install -qy ibus-panel ibus-libpinyin
 
 dnf install -qy niri --setopt=install_weak_deps=False
 dnf install -qy xrdb --setopt=install_weak_deps=False
-dnf install -qy xdg-desktop-portal-gtk xdg-desktop-portal-gnome gnome-keyring nautilus "gvfs-*"
+dnf install -qy xdg-desktop-portal-gtk xdg-desktop-portal-gnome nautilus "gvfs-*"
 dnf install -qy noctalia 
 
 dnf install -qy fuse fuse-libs
 
 dnf install -qy default-fonts gnome-icon-theme 
+
+dnf install -qy gnome-keyring gnome-keyring-pam
 
 dnf install -qy gnome-disk-utility 
 dnf install -qy git-credential-libsecret git-credential-oauth pinentry-gnome3 gnupg2-scdaemon
