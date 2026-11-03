@@ -59,19 +59,19 @@ jobs:
       - name: Build bootc image
         id: build-bootc
         shell: bash
-        run: podman build --cap-add=all --security-opt=label=type:container_runtime_t --device /dev/fuse -f Containerfile -t localhost/bouquet-bootc:44
+        run: podman build --cap-add=all --security-opt=label=type:container_runtime_t --device /dev/fuse -f Containerfile -t localhost/bouquet-bootc:45
 
       - name: Rechunk bootc image # Adapted from universal-blue rechunk justfile
         if: ${{ github.event_name != 'pull_request' }}
         shell: bash -Eueo pipefail -x {0}
         run: |
-          IMG=localhost/bouquet-bootc:44
+          IMG=localhost/bouquet-bootc:45
           CHUNKAH_OUTPUT_DIR=$(mktemp -d)
           export CHUNKAH_CONFIG_STR="$(podman inspect $IMG)"
           podman run --rm --mount=type=image,src=$IMG,dest=/chunkah \
             -v "${CHUNKAH_OUTPUT_DIR}:/run/out:Z" \
             -e CHUNKAH_CONFIG_STR quay.io/coreos/chunkah build \
-            -t ghcr.io/lumpbloom7/bouquet-bootc:44 \
+            -t ghcr.io/lumpbloom7/bouquet-bootc:45 \
             --compressed \
             --prune /sysroot/ \
             --max-layers 256 \
@@ -80,11 +80,11 @@ jobs:
             --output oci:/run/out/chunked
                   
           CHUNKED_IMAGE="$(podman pull "oci:${CHUNKAH_OUTPUT_DIR}/chunked")"
-          podman tag "${CHUNKED_IMAGE}" "ghcr.io/lumpbloom7/bouquet-bootc:44" "ghcr.io/lumpbloom7/bouquet-bootc:latest" 
+          podman tag "${CHUNKED_IMAGE}" "ghcr.io/lumpbloom7/bouquet-bootc:45" "ghcr.io/lumpbloom7/bouquet-bootc:latest" 
 
       - name: Push rechunked bootc image to registry (versioned)
         if: ${{ github.event_name != 'pull_request' }}
-        run: podman push ghcr.io/lumpbloom7/bouquet-bootc:44  
+        run: podman push ghcr.io/lumpbloom7/bouquet-bootc:45
 
       - name: Push rechunked bootc image to registry (latest)
         if: ${{ github.event_name != 'pull_request' }}
