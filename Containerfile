@@ -56,20 +56,15 @@ dnf install -qy fuse fuse-libs
 dnf install -qy default-fonts gnome-icon-theme 
 
 dnf install -qy oo7-daemon pam_oo7 pinentry-gnome3 gnupg2-scdaemon gcr3
-dnf install -qy git-core git-credential-oo7 git-credential-oauth 
+dnf install -qy git-core lazygit git-delta git-credential-oo7 git-credential-oauth
 
 dnf install -qy gnome-disk-utility 
 dnf install -qy podman-compose 
 dnf install -qy foot fish 
 
 dnf install -qy --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
-dnf install -qy lazygit git-delta
-
 dnf install -qy noctalia-greeter
-mkdir /var/lib/noctalia-greeter
-
 systemctl enable greetd
-systemctl enable noctalia-greeter-sync-perms
 
 authselect enable-feature with-systemd-homed
 systemctl enable systemd-homed
